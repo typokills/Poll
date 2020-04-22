@@ -1,4 +1,4 @@
-const TodoList = artifacts.require('./TodoList.sol')
+const TodoList = artifacts.require('./TodoList.sol') //Need to go through tutorial
 
 contract('TodoList', (accounts) => {
   before(async () => {

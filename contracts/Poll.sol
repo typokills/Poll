@@ -15,6 +15,7 @@ contract Poll {
   //Add or View Ideas
   mapping (uint => Idea) unconfirmedIdeas;
   mapping(uint => Idea) confirmedIdeas;
+  Idea winningIdea;
 
   //Staff account with admin rights
   mapping(address => bool) public staffAccount;
@@ -26,30 +27,49 @@ contract Poll {
   uint public confirmedIdeaCount;
   uint public unconfirmedIdeaCount;
   
+  //Duration for opencall for ideas period
+  uint public expiration;
+
   mapping(uint => Idea) public Ideas;
 
   constructor() public{
     // Add government account to the staffAccount list
     staffAccount[msg.sender] = true;
+    expiration = 1000;
   }
+
+  //Staff has the ability to extend the duration of the opencall
+  function extend(uint duration) public {
+    require(staffAccount[msg.sender] == true);
+
+    expiration = expiration + duration;
+  }
+
+  // For staff to add resident's address before the poll to allow them to vote
   function addVerified(address _newresident) public{
     require(staffAccount[msg.sender] == true);
 
     verifiedAcc[_newresident] = true;
   }
 
+  //Ideas added by the staff are automatically confirmed
   function staffAddIdea(string memory _newIdea) public {
     require(staffAccount[msg.sender] == true);
     confirmedIdeaCount ++;
     confirmedIdeas[confirmedIdeaCount] = Idea(confirmedIdeaCount, _newIdea, 0);}
 
+  //Ideas added by residents need to be confirmed by the staff
   function residentAddIdea(string memory _newIdea) public{
     require(verifiedAcc[msg.sender]==true);
+    require(now <= expiration);
+    require(unconfirmedIdeaCount < 9); // Ensures residents can only submit 9 ideas
     unconfirmedIdeaCount ++;
     unconfirmedIdeas[unconfirmedIdeaCount] = Idea(unconfirmedIdeaCount,_newIdea,0);}
-
+    
+  //Function for staff to approve unconfirmed ideas
   function approveIdea(uint index) private {
     require(staffAccount[msg.sender] == true);
+    require(confirmedIdeaCount < 10); //Ensures only 10 confirmed ideas
 
     confirmedIdeaCount ++;
     confirmedIdeas[confirmedIdeaCount] = unconfirmedIdeas[index];
@@ -57,4 +77,21 @@ contract Poll {
     unconfirmedIdeaCount --;
     delete unconfirmedIdeas[index];
   }
+
+  //Function to allow residents to vote on their favourite idea
+  function vote(uint indexChoice) public{
+    require(voters[msg.sender] == false);
+
+    voters[msg.sender] = true;
+
+    confirmedIdeas[indexChoice].voteCount ++;
+
+  }
+
+  //Allows the staff to close the poll and not accept any more votes
+  function closePoll() public{
+    require(staffAccount[msg.sender] == true);
+    
+  }
+
 }
