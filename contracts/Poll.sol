@@ -29,10 +29,14 @@ contract Poll {
   mapping(uint => Idea) public Ideas;
 
   constructor() public{
-   // Add government account to the staffAccount list
-
+    // Add government account to the staffAccount list
+    staffAccount[msg.sender] = true;
   }
+  function addVerified(address _newresident) public{
+    require(staffAccount[msg.sender] == true);
 
+    verifiedAcc[_newresident] = true;
+  }
 
   function staffAddIdea(string memory _newIdea) public {
     require(staffAccount[msg.sender] == true);
