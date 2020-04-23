@@ -36,6 +36,7 @@ contract Poll {
     // Add government account to the staffAccount list
     staffAccount[msg.sender] = true;
     expiration = 1000;
+    staffAddIdea("Test Idea");
   }
 
   //Staff has the ability to extend the duration of the opencall
@@ -54,7 +55,7 @@ contract Poll {
 
   //Ideas added by the staff are automatically confirmed
   function staffAddIdea(string memory _newIdea) public {
-    require(staffAccount[msg.sender] == true);
+    //require(staffAccount[msg.sender] == true);
     confirmedIdeaCount ++;
     confirmedIdeas[confirmedIdeaCount] = Idea(confirmedIdeaCount, _newIdea, 0);}
 
@@ -91,7 +92,7 @@ contract Poll {
   //Allows the staff to close the poll and not accept any more votes
   function closePoll() public{
     require(staffAccount[msg.sender] == true);
-    
+
   }
 
 }

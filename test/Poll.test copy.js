@@ -1,26 +1,23 @@
 const Poll = artifacts.require('./Poll.sol') //Need to go through tutorial
 
 contract('Poll', (accounts) => {
-  before(async () => {
-    this.Poll = await Poll.deployed()
+  before(async () => { //before each test run
+    this.Poll = await Poll.deployed() //copy of the Poll deployed to the blockchain
   })
 
+  //Checks that the Poll contract is deployed successfully
   it('deploys successfully', async () => {
-    const address = await this.Poll.address
+    const address = await this.Poll.address //Get the address of the contract
     assert.notEqual(address, 0x0)
-    assert.notEqual(address, '')
+    assert.notEqual(address, '') //Makes sure that the address is not empty
     assert.notEqual(address, null)
     assert.notEqual(address, undefined)
   })
 
-  // it('lists tasks', async () => {
-  //   const taskCount = await this.todoList.taskCount()
-  //   const task = await this.todoList.tasks(taskCount)
-  //   assert.equal(task.id.toNumber(), taskCount.toNumber())
-  //   assert.equal(task.content, 'Check out dappuniversity.com')
-  //   assert.equal(task.completed, false)
-  //   assert.equal(taskCount.toNumber(), 1)
-  // })
+  it('staffAddIdea function is working', async () => {
+    const confirmedIdeaCount = await this.Poll.confirmedIdeaCount()
+    assert.equal(confirmedIdeaCount.toNumber(), 1)
+  })
 
   // it('creates tasks', async () => {
   //   const result = await this.todoList.createTask('A new task')
