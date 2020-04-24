@@ -32,6 +32,20 @@ contract Poll {
 
   mapping(uint => Idea) public Ideas;
 
+  event confirmedIdeaCreated(
+    uint id,
+    string details,
+    uint voteCount
+  );
+
+  event votedIdea(
+    uint voteCount
+  );
+
+  event newResident(
+    address secret
+    );
+
   constructor() public{
     // Add government account to the staffAccount list
     staffAccount[msg.sender] = true;
@@ -51,13 +65,16 @@ contract Poll {
     require(staffAccount[msg.sender] == true);
 
     verifiedAcc[_newresident] = true;
+
+    emit newResident(_newresident); 
   }
 
   //Ideas added by the staff are automatically confirmed
   function staffAddIdea(string memory _newIdea) public {
     //require(staffAccount[msg.sender] == true);
     confirmedIdeaCount ++;
-    confirmedIdeas[confirmedIdeaCount] = Idea(confirmedIdeaCount, _newIdea, 0);}
+    confirmedIdeas[confirmedIdeaCount] = Idea(confirmedIdeaCount, _newIdea, 0);
+    emit confirmedIdeaCreated(confirmedIdeaCount, _newIdea, 0);}
 
   //Ideas added by residents need to be confirmed by the staff
   function residentAddIdea(string memory _newIdea) public{
@@ -79,14 +96,20 @@ contract Poll {
     delete unconfirmedIdeas[index];
   }
 
+  event votedIdea(
+    uint id,
+    string details,
+    uint voteCount
+  );
   //Function to allow residents to vote on their favourite idea
   function vote(uint indexChoice) public{
-    require(voters[msg.sender] == false);
+    //require(voters[msg.sender] == false);
 
     voters[msg.sender] = true;
 
     confirmedIdeas[indexChoice].voteCount ++;
 
+    emit votedIdea(confirmedIdeas[indexChoice].voteCount);
   }
 
   //Allows the staff to close the poll and not accept any more votes

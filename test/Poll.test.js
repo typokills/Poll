@@ -14,20 +14,29 @@ contract('Poll', (accounts) => {
     assert.notEqual(address, undefined)
   })
 
-  it('staffAddIdea function is working', async () => {
+  it('confirmedIdeaCount', async () => {
     const confirmedIdeaCount = await this.Poll.confirmedIdeaCount()
     assert.equal(confirmedIdeaCount.toNumber(), 1)
   })
 
-  // it('creates tasks', async () => {
-  //   const result = await this.todoList.createTask('A new task')
-  //   const taskCount = await this.todoList.taskCount()
-  //   assert.equal(taskCount, 2)
-  //   const event = result.logs[0].args
-  //   assert.equal(event.id.toNumber(), 2)
-  //   assert.equal(event.content, 'A new task')
-  //   assert.equal(event.completed, false)
-  // })
+  it('staffAddIdea function is working', async () => {
+    const confirmedIdea = await this.Poll.staffAddIdea('New Idea')
+    const confirmedIdeaCount = await this.Poll.confirmedIdeaCount()
+    assert.equal(confirmedIdeaCount.toNumber(), 2)
+
+    const event = confirmedIdea.logs[0].args
+    assert.equal(event.id.toNumber(), 2)
+    assert.equal(event.details, 'New Idea')
+    assert.equal(event.voteCount, 0)
+  })
+
+  it('addVerified', async () => {
+    const newResident = await this.Poll.addVerified(this.address)
+    const event = newResident.logs[0].args
+    console.log(newResident)
+    assert.equal(event.secret,this.address)
+
+  })
 
   // it('toggles task completion', async () => {
   //   const result = await this.todoList.toggleCompleted(1)
